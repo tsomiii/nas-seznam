@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Náš seznam T+L ❤️</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background-color: #121212;
+      color: #f5f5f5;
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 3rem;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    h1 {
+      font-size: 2.8rem;
+      color: #d87d7d;
+      margin-bottom: 2rem;
+    }
+
+    .input-group {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    input[type="text"] {
+      padding: 1rem;
+      border: none;
+      border-radius: 10px;
+      background-color: #1e1e1e;
+      color: #fff;
+      width: 280px;
+      font-size: 1.2rem;
+    }
+
+    button {
+      padding: 1rem 1.4rem;
+      background-color: #d87d7d;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    li {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: #1e1e1e;
+      color: #fff;
+      padding: 0.8rem 1rem;
+      border-radius: 10px;
+      margin-bottom: 0.5rem;
+    }
+
+    .done {
+      text-decoration: line-through;
+      color: #a5a5a5;
+    }
+  </style>
+</head>
+<body>
+  <h1>Náš seznam T+L ❤️</h1>
+  <div class="input-group">
+    <input type="text" id="itemInput" placeholder="Přidat položku" />
+    <button onclick="addItem()">Přidat</button>
+  </div>
+  <ul id="itemList"></ul>
+
+  <script>
+    // Load saved items from localStorage when the page loads
+    window.onload = function () {
+      const savedItems = JSON.parse(localStorage.getItem('todoList')) || [];
+      const list = document.getElementById('itemList');
+      savedItems.forEach(item => {
+        const listItem = document.createElement('li');
+        listItem.innerHTML = `
+          <span class="${item.done ? 'done' : ''}">${item.text}${item.done ? ' 😊' : ''}</span>
+          ${!item.done ? '<button onclick="markDone(this)">✔️</button>' : ''}
+        `;
+        list.appendChild(listItem);
+      });
+    };
+
+    function addItem() {
+      const input = document.getElementById('itemInput');
+      const itemText = input.value.trim();
+      if (itemText === '') return;
+
+      const list = document.getElementById('itemList');
+      const listItem = document.createElement('li');
+      listItem.innerHTML = `
+        <span>${itemText}</span>
+        <button onclick="markDone(this)">✔️</button>
+      `;
+      list.appendChild(listItem);
+
+      saveItems();
+      input.value = '';
+    }
+
+    function markDone(button) {
+      const listItem = button.parentElement;
+      const textSpan = listItem.querySelector('span');
+      textSpan.classList.add('done');
+      textSpan.innerHTML += ' 😊';
+      button.remove();
+
+      saveItems();
+    }
+
+    // Save the current list to localStorage
+    function saveItems() {
+      const listItems = document.querySelectorAll('#itemList li');
+      const items = Array.from(listItems).map(listItem => {
+        const textSpan = listItem.querySelector('span');
+        return {
+          text: textSpan.textContent.trim(),
+          done: textSpan.classList.contains('done')
+        };
+      });
+      localStorage.setItem('todoList', JSON.stringify(items));
+    }
+  </script>
+</body>
+</html>
